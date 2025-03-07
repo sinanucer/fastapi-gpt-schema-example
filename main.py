@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.openapi.utils import get_openapi
 from pydantic import BaseModel
 from typing import List
 
@@ -22,3 +23,20 @@ def get_books():
 def add_book(book: Book):
     books.append(book)
     return book
+
+def custom_openapi():
+    if app.openapi_schema:
+        return app.openapi_schema
+    openapi_schema = get_openapi(
+        title="Book Library API",
+        version="1.0.0",
+        description="An API to manage books with FastAPI.",
+        routes=app.routes,
+    )
+    openapi_schema["servers"] = [
+        {"url": "https://fastapi-gpt-schema-example.onrender.com"}
+    ]
+    app.openapi_schema = openapi_schema
+    return app.openapi_schema
+
+app.openapi = custom_openapi
